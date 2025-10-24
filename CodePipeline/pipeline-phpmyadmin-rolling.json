@@ -1,0 +1,72 @@
+{
+  "pipeline": {
+    "name": "phpmyadmin-pipeline-rolling-yoshiike-20251019",
+    "roleArn": "arn:aws:iam::963220189927:role/CodePipelineServiceRole-yoshiike-20251019",
+    "artifactStore": {
+      "type": "S3",
+      "location": "codepipeline-artifact-yoshiike-20251019"
+    },
+    "stages": [
+      {
+        "name": "Source",
+        "actions": [
+          {
+            "name": "Source",
+            "actionTypeId": {
+              "category": "Source",
+              "owner": "AWS",
+              "provider": "CodeStarSourceConnection",
+              "version": "1"
+              },
+            "configuration": {
+              "ConnectionArn": "arn:aws:codestar-connections:ap-northeast-1:963220189927:connection/arn:aws:codestar-connections:ap-northeast-1:963220189927:connection/17ba20dc-2e1b-42a2-bdf8-cdafc83e3255",
+              "FullRepositoryId": "youri0326/ci_cd_aws_seminar_phpmyadmin",
+              "BranchName": "main"
+            },
+            "outputArtifacts": [{ "name": "SourceOutput" }]              
+          }
+        ]
+      },
+      {
+        "name": "Build",
+        "actions": [
+          {
+            "name": "CodeBuild",
+            "actionTypeId": { 
+              "category": "Build", 
+              "owner": "AWS", 
+              "provider": "CodeBuild", 
+              "version": "1" 
+            },
+            "inputArtifacts": [{ "name": "SourceOutput" }],
+            "outputArtifacts": [{ "name": "BuildOutput" }],
+            "configuration": { 
+              "ProjectName": "phpmyadmin-build-yoshiike-20251019" 
+            }
+          }
+        ]
+      },
+      {
+        "name": "Deploy",
+        "actions": [
+          {
+            "name": "ECS_Rolling_Deploy",
+            "actionTypeId": { 
+              "category": "Deploy",
+               "owner": "AWS",
+               "provider": "ECS",
+               "version": "1" 
+                },
+            "inputArtifacts": [{ "name": "BuildOutput" }],
+            "configuration": {
+              "ClusterName": "ecs-cluster-yoshiike-20251019",
+              "ServiceName": "phpmyadmin-service-yoshiike-20251019",
+              "FileName": "imagedefinitions.json"
+            }
+          }
+        ]
+      }
+    ],
+    "version": 1
+  }
+}
