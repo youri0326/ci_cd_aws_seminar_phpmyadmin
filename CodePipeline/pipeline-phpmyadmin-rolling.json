@@ -1,0 +1,72 @@
+{
+  "pipeline": {
+    "name": "phpmyadmin-pipeline-rolling-yoshiike-0106",
+    "roleArn": "arn:aws:iam::963220189927:role/CodePipelineServiceRole-yoshiike-0106",
+    "artifactStore": {
+      "type": "S3",
+      "location": "cicd-yoshiike-0106"
+    },
+    "stages": [
+      {
+        "name": "Source",
+        "actions": [
+          {
+            "name": "Source",
+            "actionTypeId": {
+              "category": "Source",
+              "owner": "AWS",
+              "provider": "CodeStarSourceConnection",
+              "version": "1"
+              },
+            "configuration": {
+              "ConnectionArn": "arn:aws:codestar-connections:ap-northeast-1:963220189927:connection/4a4ca59a-5c89-4c40-9a72-406e87695039",
+              "FullRepositoryId": "youri0326/ci_cd_aws_seminar_phpmyadmin",
+              "BranchName": "main"
+            },
+            "outputArtifacts": [{ "name": "SourceOut" }]              
+          }
+        ]
+      },
+      {
+        "name": "Build",
+        "actions": [
+          {
+            "name": "CodeBuild",
+            "actionTypeId": { 
+              "category": "Build", 
+              "owner": "AWS", 
+              "provider": "CodeBuild", 
+              "version": "1" 
+            },
+            "inputArtifacts": [{ "name": "SourceOut" }],
+            "outputArtifacts": [{ "name": "BuildOut" }],
+            "configuration": { 
+              "ProjectName": "phpmyadmin-build-yoshiike-0106" 
+            }
+          }
+        ]
+      },
+      {
+        "name": "Deploy",
+        "actions": [
+          {
+            "name": "ECS_Rolling_Deploy",
+            "actionTypeId": { 
+              "category": "Deploy",
+               "owner": "AWS",
+               "provider": "ECS",
+               "version": "1" 
+                },
+            "inputArtifacts": [{ "name": "BuildOut" }],
+            "configuration": {
+              "ClusterName": "ecs-cluster-yoshiike-0106",
+              "ServiceName": "phpmyadmin-service-yoshiike-0106",
+              "FileName": "imagedefinitions.json"
+            }
+          }
+        ]
+      }
+    ],
+    "version": 1
+  }
+}
