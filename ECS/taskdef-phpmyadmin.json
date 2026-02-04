@@ -1,0 +1,36 @@
+{
+  "family": "task-phpmyadmin-yoshiike-0128",
+  "networkMode": "awsvpc",
+  "executionRoleArn": "arn:aws:iam::527151769671:role/TaskExecutionRole-yoshiike-0128",
+  "containerDefinitions": [
+    {
+      "name": "phpmyadmin",
+      "image": "phpmyadmin:5.2.1",
+      "memory": 512,
+      "cpu": 256,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "PMA_HOST", "value": "sampledb" },
+        { "name": "PMA_USER", "value": "root" },
+        { "name": "PMA_PASSWORD", "value": "root1234" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/task-yoshiike-0128",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "phpmyadmin"
+        }
+      }
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024"
+}
